@@ -1,0 +1,303 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Ubiquity - AU10TIX API",
+    "version": "v1.12"
+  },
+  "servers": [
+    {
+      "url": "https://au10tix-api.intouch.app",
+      "description": "Production Server"
+    },
+    {
+      "url": "https://au10tix-api-qa.intouch.app",
+      "description": "QA, staging server for testing"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Queue Proof of Identity (UID)"
+    },
+    {
+      "name": "Update Proof of Identity (UID)"
+    },
+    {
+      "name": "Queue Proof of Address (POA)"
+    },
+    {
+      "name": "Update Proof of Address (POA)"
+    },
+    {
+      "name": "GDPR Delete Request"
+    },
+    {
+      "name": "InTouch API Error Responses"
+    }
+  ],
+  "paths": {
+    "/v1/queue_uid/": {
+      "post": {
+        "tags": [
+          "Queue Proof of Identity (UID)"
+        ],
+        "summary": "Pushes user/customer data and document photos.",
+        "description": "AU10TIX pushes user/customer data and document photos to Ubiquity for manual inspection. After the data and documents are submitted, Ubiquity system will enqueue and assign them to available agents to start the review.",
+        "requestBody": {
+          "required": true,
+          "description": "",
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/PayloadUID"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "4XX": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Based on queue UID webhook": {
+      "post": {
+        "tags": [
+          "Update Proof of Identity (UID)"
+        ],
+        "summary": "Pushes an updated user/customer data.",
+        "description": "Ubiquity pushes an updated user/customer data with decisions back to AU10TIX. In case no changes were made to a field, the original data that was received in the “Queue UID” API call will be sent back. Images will not be sent back but can be referenced on the AU10TIX side using the case_id.",
+        "responses": {
+          "200": {
+            "description": "A JSON array of user names",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/queue_poa/": {
+      "post": {
+        "tags": [
+          "Queue Proof of Address (POA)"
+        ],
+        "summary": "Pushes a user/customer's full name and proof of address photo.",
+        "description": "AU10TIX pushes a user/customer's full name and proof of address photo to Ubiquity for manual inspection. After the data and document were submitted, Ubiquity system will enqueue and assign them to available agents to start the review.",
+        "responses": {
+          "200": {
+            "description": "A JSON array of user names",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Based on queue POA webhook": {
+      "post": {
+        "tags": [
+          "Update Proof of Address (POA)"
+        ],
+        "summary": "Pushes an updated user/customer’s proof of address.",
+        "description": "Ubiquity pushes an updated user/customer’s proof of address back to AU10TIX. Images will not be sent back but can be referenced on the AU10TIX side using the case_id.",
+        "responses": {
+          "200": {
+            "description": "A JSON array of user names",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/gdpr_delete/": {
+      "post": {
+        "tags": [
+          "GDPR Delete Request"
+        ],
+        "summary": "Sends a GDPR delete request.",
+        "description": "AU10TIX sends a GDPR delete request to remove all related data of a specific case within the InTouch system.",
+        "responses": {
+          "200": {
+            "description": "A JSON array of user names",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "PayloadUID": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "integer",
+            "format": "timestamp",
+            "description": "UNIX timestamp when AU10TIX sent the API request to Ubiquity user_data"
+          },
+          "user_data": {
+            "type": "object",
+            "properties": {
+              "case_id": {
+                "type": "string",
+                "format": "32 hexadecimal characters",
+                "description": "Unique case ID"
+              },
+              "client_id": {
+                "type": "string",
+                "description": "Unique client ID"
+              },
+              "country": {
+                "type": "string",
+                "description": "Customer’s country <br> Based on AU10TIX defined country names (eg. United States is USA)"
+              },
+              "state": {
+                "type": "string",
+                "description": "Customer’s state address <br> Based on AU10TIX defined state names (eg. New York, USA is USA_NY)"
+              },
+              "document_type": {
+                "type": "string",
+                "description": "Customer’s submitted document for Proof of Identification <br> List of possible document types <ul> <li>Driving License</li> <li>ID Card</li> <li>Passport</li> <li>Permanent Resident Card</li> <li>Social Security Card</li> <li>Visa</li> </ul>"
+              },
+              "full_name": {
+                "type": "string",
+                "description": "Customer’s full name"
+              },
+              "document_number": {
+                "type": "string",
+                "description": ""
+              },
+              "personal_number": {
+                "type": "string",
+                "description": ""
+              },
+              "address": {
+                "type": "string",
+                "description": ""
+              },
+              "date_of_birth": {
+                "type": "string",
+                "description": ""
+              },
+              "date_of_issuance": {
+                "type": "string",
+                "description": ""
+              },
+              "date_of_expiration": {
+                "type": "string",
+                "description": ""
+              },
+              "forgeries": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": ""
+              },
+              "descision": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": ""
+              }
+            }
+          },
+          "bos_remarks": {
+            "type": "object"
+          },
+          "webhook": {
+            "type": "object"
+          }
+        },
+        "example": {
+          "timestamp": 1560535825,
+          "user_data": {
+            "case_id": "BD7C2487A801E93D021113...",
+            "client_id": "515",
+            "language_code": null,
+            "country": "USA",
+            "state": "USA_NY",
+            "document_type": "Passport",
+            "full_name": "John Doe",
+            "document_number": "31195877",
+            "personal_number": "42206988",
+            "address": "123 Main Street, NY",
+            "date_of_birth": "1980-12-25",
+            "date_of_issuance": "2015-11-28",
+            "date_of_expiration": "2020-12-25",
+            "forgeries": [
+              "Face Compare",
+              "Text Replacement"
+            ],
+            "decision": {
+              "photo_tag": {
+                "front": "Front",
+                "back": "Back",
+                "selfie": "Selfie"
+              }
+            }
+          },
+          "bos_remarks": "test",
+          "webhook": "test"
+        }
+      }
+    }
+  }
+}
