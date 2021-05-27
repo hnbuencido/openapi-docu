@@ -1,0 +1,117 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Ubiquity - AU10TIX API",
+    "version": "v1.12"
+  },
+  "servers": [
+    {
+      "url": "https://au10tix-api.intouch.app/"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Queue Proof of Identity (UID)"
+    },
+    {
+      "name": "Update Proof of Identity (UID)"
+    },
+    {
+      "name": "Queue Proof of Address (POA)"
+    },
+    {
+      "name": "Update Proof of Address (POA)"
+    },
+    {
+      "name": "GDPR Delete Request"
+    },
+    {
+      "name": "InTouch API Error Responses"
+    }
+  ],
+  "paths": {
+    "/v1/queue_uid/": {
+      "post": {
+        "tags": [
+          "Queue Proof of Identity (UID)"
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "required": [
+                  "data",
+                  "front"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "string",
+                    "description": "stringified JSON <br><br> JSON key description:<br><br> timestamp <ul> <li>UNIX timestamp when AU10TIX sent the API request to Ubiquity</li> </ul> user_data <ul> <li>case_id <ul> <li>Unique case ID; 32 hexadecimal characters</li> </ul></li> <li>client_id <ul> <li>Unique client ID</li> </ul></li> <li>country <ul> <li>Customer&rsquo;s country</li> <li>Based on AU10TIX defined country names (eg. United States is USA)</li> </ul></li> <li>state <ul> <li>Customer&rsquo;s state address</li> <li>Based on AU10TIX defined state names (eg. New York, USA is USA_NY)</li> </ul></li> <li>document_type <ul> <li>Customer&rsquo;s submitted document for Proof of Identification</li> <li>List of possible document types:</li> <ul> <li>Driving License</li> <li>ID Card</li> <li>Passport</li> <li>Permanent Resident Card</li> <li>Social Security Card</li> <li>Visa</li> </ul> </ul></li> <li>language_code <ul> <li>ID document&rsquo;s language code. See <strong>Language Codes</strong> for possible values.</li> </ul></li> <li>full_name <ul> <li>Customer&rsquo;s full name</li> </ul></li> <li>document_number <ul> <li>Document ID number</li> </ul></li> <li>personal_number <ul> <li>Personal ID number of the document</li> </ul></li> <li>address <ul> <li>Customer&rsquo;s address</li> <li>This field is configurable per client whether to be exposed in the UI or not</li> </ul></li> <li>date_of_birth <ul> <li>Customer&rsquo;s date of birth on the document</li> <li>ISO 8601 date format (YYYY-MM-DD) or null</li> </ul></li> <li>date_of_issuance <ul> <li>Document&rsquo;s date of issuance</li> <li>ISO 8601 date format (YYYY-MM-DD) or null</li> </ul></li> <li>date_of_expiration <ul> <li>Document&rsquo;s date of expiration</li> <li>ISO 8601 date format (YYYY-MM-DD) or null</li> </ul></li> <li>forgeries <ul> <li>List of possible document forgeries:&nbsp;</li> <ul> <li>Face Compare</li> <li>Back to Front</li> <li>MRZ to VIZ</li> <li>Text Replacement</li> <li>Photo Replacement</li> </ul> </ul></li> <li>decision &gt; photo_tag <ul> <li>Optional data for the document sides from BOS remarks. Each photo tag can be empty.</li> <li>List of possible values for front and back tags:</li> <ul> <li>Front</li> <li>Back</li> <li>Front and Back</li> <li>Non-ID</li> </ul> <li>List of possible values for selfie:</li> <ul> <li>Selfie</li> <li>Non-Selfie</li> </ul> </ul> </ul></li> bos_remarks <ul> <li>Optional data for exposing document authenticity. Each remark can be empty. See <strong>Expose Authenticity</strong>.</li> </ul> webhook <ul> <li>uri <ul> <li>AU10TIX URI to use in calling the &ldquo;Update UID&rdquo; API</li> </ul> <li>token <ul> <li>JWT to use for &ldquo;Update UID&rdquo; API authentication</li> </ul>",
+                    "default": "{ \"timestamp\": 1560535716, \"user_data\": { \"case_id\": \"BD7C2487A801E93D02111...\", \"client_id\": \"515\", \"language_code\": null, \"country\": \"USA\", \"state\": \"USA_NY\", \"document_type\": \"Passport\", \"full_name\": \"John Doe\", \"document_number\": \"31195877\", \"personal_number\": “42206988” \"address\": \"123 Main Street, NY\", \"date_of_birth\": \"1980-12-25\", \"date_of_issuance\": \"2015-11-28\", \"date_of_expiration\": \"2020-12-25\", \"forgeries\": [ \"Face Compare\", \"Text Replacement\" ], \"decision\": { \"photo_tag\": { \"front\": \"Front\", \"back\": \"Back\", \"selfie\": \"Selfie\" } } }, \"bos_remarks\": { \"document_authenticity\": 20, \"processing_result\": [ 140, 220 ], \"face_comparison_report\": { \"completion_status\": 14 } }, \"webhook\": { \"uri\": \"<URI>\", \"token\": \"<JWT>\" } }"
+                  },
+                  "front": {
+                    "type": "string",
+                    "description": "Front photo of customer’s document ID",
+                    "format": "binary"
+                  },
+                  "back": {
+                    "type": "string",
+                    "description": "Back photo of customer’s document ID",
+                    "format": "binary"
+                  },
+                  "selfie": {
+                    "type": "string",
+                    "description": "Selfie photo of the customer",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {}
+          },
+          "400": {
+            "description": " <table> <thead><td>Error Reason</td><td>Description</td></thead> <tbody> <tr> <td>Data is required.</td> <td>POST request does not contain &ldquo;data&rdquo;.</td> </tr> <tr> <td>Unable to parse data to JSON.</td> <td>POST request &ldquo;data&rdquo; is not a valid JSON string.</td> </tr> <tr> <td>Incomplete data.</td> <td>POST request &ldquo;data&rdquo; JSON does not have all of the expected keys: [timestamp, user_data, webhook]</td> </tr> <tr> <td>Incomplete user_data.</td> <td>&ldquo;user_data&rdquo; JSON does not have all of the expected keys.<br />For UID: [case_id, client_id, country, state, document_type, document_number, personal_number, full_name, date_of_birth, date_of_issuance, date_of_expiration, forgeries]<br />For POA: [case_id, client_id, full_name]</td> </tr> <tr> <td>Incomplete webhook.</td> <td>POST request &ldquo;data&rdquo; JSON &ldquo;webhook&rdquo; does not have all of the expected keys: [uri, token]</td> </tr> <tr> <td>XXXXX file type is not allowed.</td> <td>POST request &ldquo;front&rdquo;, &ldquo;back&rdquo;, &ldquo;selfie&rdquo;, or &ldquo;proof_of_address&rdquo; does not have a valid file extensions: [bmp, jpeg, jpg, pdf, png, tif, tiff]</td> </tr> <tr> <td>Front ID photo is required.</td> <td>POST request does not contain &ldquo;front&rdquo;.</td> </tr> <tr> <td>Proof of address photo is required.</td> <td>POST request does not contain &ldquo;proof_of_address&rdquo;.</td> </tr> <tr> <td>No required SSL certificate was sent</td> <td>Client certificate was not sent for the API request</td> </tr> <tr> <td>No queue configured for client_id: [XXXXX]</td> <td>No queue configured for the client_id XXXXX. Advise Ubiquity Operations to add a queue configuration for this client.</td> </tr> <tr> <td>Unhandled error: XXXXX</td> <td>Internal server error with the simplified error description XXXXX. Send an email to Ubiquity Helpdesk to resolve this.</td> </tr> </tbody> </table>",
+            "content": {}
+          },
+          "405": {
+            "description": "<table> <thead><td>Error Reason</td><td>Description</td></thead> <tbody><tr> <td>Method not allowed.</td> <td>Request method used is not &ldquo;POST&rdquo;.</td> </tr></tbody></table>",
+            "content": {}
+          },
+          "413": {
+            "description": "<table> <thead><td>Error Reason</td><td>Description</td></thead> <tbody><tr> <td>Generic Error 413.</td> <td>Payload Too Large.</td> </tr></tbody></table>",
+            "content": {}
+          },
+          "500": {
+            "description": "<table> <thead><td>Error Reason</td><td>Description</td></thead> <tbody><tr> <td>Method not allowed.</td> <td>Request method used is not &ldquo;POST&rdquo;.</td> </tr></tbody></table>",
+            "content": {}
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ApiResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "type": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
