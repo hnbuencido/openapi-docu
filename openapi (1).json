@@ -1,0 +1,74 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Intouch - Au10tix",
+    "version": "v1.12"
+  },
+  "tags": [
+    {
+      "name": "Queue Proof of Identity (UID)"
+    }
+  ],
+  "paths": {
+    "/v1/queue_uid/": {
+      "post": {
+        "tags": [
+          "Queue Proof of Identity (UID)"
+        ],
+        "description": " AU10TIX pushes user/customer data and document photos to Ubiquity for manual inspection. After the data and documents are submitted, Ubiquity system will enqueue and assign them to available agents to start the review.\n\n**Sample cURL**\n\n```curl -i -H 'Content-Type: multipart/form-data' -F 'data={“timestamp“: 1560535716, “user_data“: {“case_id“: “BD7C2487A801E93D0211134CB5FADB4E“, “client_id“: “515“, “language_code“: null, “country“: “USA“, “state“: “USA_NY“, “document_type“: “Passport“, “document_number“: “31195877“, “personal_number“: “42206988”, “full_name“: “John Doe“, “address“: “123 Main Street, NY“, “date_of_birth“: “1980-12-25“, “date_of_issuance“: “2015-11-28“, “date_of_expiration“: “2020-12-25“, “forgeries“: [“Face Compare“, “Text Replacement“]}, “webhook“: {“uri“: “<URI>“, “token“: “<JWT>“}}' -F 'front=@/local/path/front.jpg' -F 'back=@/local/path/back.jpg' -F 'selfie=@/local/path/selfie.jpg' -X POST https://au10tix-api-qa.intouch.app/v1/queue_uid/ ``` ",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "required": [
+                  "data",
+                  "front"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "string"
+                  },
+                  "front": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "back": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "selfie": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "description": " Error Reason\n- Data is required : POST request does not contain “data”. ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error_reason": {
+                      "type": "string",
+                      "description": "reason text"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
